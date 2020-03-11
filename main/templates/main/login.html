@@ -1,0 +1,32 @@
+{% extends 'main/base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+  <div class="row justify-content-center">
+    <div class="col-6">
+      <div class="card">
+        <div class="card-body">
+              {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                        {{ message }}
+                    </li>
+                  {% endfor %}
+                </ul>
+                {% endif %}
+          <h2>Log in</h2>
+          <form method="post" novalidate>
+            {% csrf_token %}
+            {{ form|crispy }}
+            <button type="submit" class="btn btn-primary">Log in</button>
+
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

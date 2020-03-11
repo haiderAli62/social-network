@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+<a href="{% url 'ceo_dashboard' %}" class="btn btn-primary ml-2">Dashboard</a>
+  <p>This is CEO admin page!</p>
+  <strong> welcom : </strong>  {{user}}
+
+                    {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>
+                        {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %} {% endif %}
+                        {{ message }}
+                    </li>
+                  {% endfor %}
+                     </ul>
+                {% endif %}
+    <a href="{% url 'create_hr' %}" class="btn btn-primary ml-2">Create HR</a>
+    <a href="{% url 'create_cto' %}" class="btn btn-primary ml-2">Create CTO</a>
+    <a href="{% url 'create_sse' %}" class="btn btn-primary ml-2">Create Junior Software Engineer</a>
+    <a href="{% url 'create_jse' %}" class="btn btn-primary ml-2">Create Senior Software Engineer</a>
+
+
+
+
+
+{% endblock %}

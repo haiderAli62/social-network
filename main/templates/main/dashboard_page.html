@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+  <p>This is Dashboard!</p>
+  <strong> welcom : </strong>  {{user}}
+   <a href="{% url 'upload_post' %}" class="btn btn-primary ml-2">Upload post</a>
+    {% if user.is_ceo %}
+         <a href="{% url 'ceo_admin' %}" class="btn btn-primary ml-2">Create Users</a>
+    {% endif %}
+    <h1>News Feed</h1>
+    {% for post in Posts %}
+
+    <h2 style="color:#0B2161;" >{{ post.title }}</h2>
+    <hr>
+    <p>{{post.description}}</p>
+    <h5>Uploaded by : {{post.user}}</h5>
+    <hr>
+
+
+	{% endfor %}
+
+{% endblock %}

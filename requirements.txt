@@ -1,2 +1,5 @@
-django
+django==3.0.4
 django-crispy-forms
+django-tz-detect
+Django-Gtranslate
+

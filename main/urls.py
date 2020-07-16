@@ -4,7 +4,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('main/', views.index, name="main"),
+    path('', views.index, name="main"),
     path('signup_ceo/', views.signup_ceo, kwargs={'Form': SignupFormCeo}, name='signup_ceo'),
     path('signup_hr/', views.signup_hr, kwargs={'Form': SignupFormHr}, name='signup_hr'),
     path('signup_cto/', views.signup_cto, kwargs={'Form': SignupFormCto}, name='signup_cto'),

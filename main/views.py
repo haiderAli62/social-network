@@ -1,6 +1,11 @@
+from django.utils import timezone
+from django.utils.timezone import utc
+import datetime
+from gtranslate.views import gTranslate
+from django.utils import translation
 from django.shortcuts import render, redirect
 # from django.contrib.auth.models import User
-from .forms import SignupFormCeo , SignupFormHr , SignupFormCto , SignupFormSeniorSE , SignupFormJuniorSE
+from .forms import SignupFormCeo, SignupFormHr, SignupFormCto, SignupFormSeniorSE, SignupFormJuniorSE
 from .forms import UploadPostForm
 from .models import Post, User
 from django.contrib import messages
@@ -9,6 +14,9 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
+
+from googletrans import Translator
+gtrans = Translator()
 
 
 # Create your views here.
@@ -30,7 +38,8 @@ def upload_post_view(request):
             post_obj.user = request.user
             post_obj.save()
             if request.user.is_ceo:
-                return redirect('ceo_dashboard')  # HttpResponseRedirect(reverse("index"))
+                # HttpResponseRedirect(reverse("index"))
+                return redirect('ceo_dashboard')
             elif request.user.is_hr:
                 return redirect('hr_dashboard')
             elif request.user.is_cto:
@@ -76,7 +85,7 @@ def signup_hr(request, Form):
     return render(request, 'main/signup.html', {'form': f})
 
 
-def signup_cto(request ,Form):
+def signup_cto(request, Form):
     if request.method == 'POST':
         f = Form(request.POST)
         if f.is_valid():
@@ -108,8 +117,9 @@ def logout_view(request):
     logout(request)
     return redirect('login')
 
+
 def admin(request):
-    return render(request , 'main/admin.html')
+    return render(request, 'main/admin.html')
 
 
 def login_view(request):
@@ -140,6 +150,8 @@ def login_view(request):
     return render(request=request,
                   template_name="main/login.html",
                   context={"form": form})
+
+
 @login_required
 @user_passes_test(lambda u: u.is_ceo)
 def create_hr(request):
@@ -156,6 +168,7 @@ def create_hr(request):
     else:
         f = SignupFormHr()
     return render(request, 'main/signup.html', {'form': f})
+
 
 @login_required
 @user_passes_test(lambda u: u.is_ceo)
@@ -174,6 +187,7 @@ def create_cto(request):
         f = SignupFormCto()
     return render(request, 'main/signup.html', {'form': f})
 
+
 @login_required
 @user_passes_test(lambda u: u.is_ceo)
 def create_engineers(request, Form):
@@ -187,27 +201,41 @@ def create_engineers(request, Form):
         f = Form()
     return render(request, 'main/signup.html', {'form': f})
 
+#titles = []
+    #head, sep, tail = current_lang.partition('-')
+    # for p in Post.objects.all():
+    #    print(gTranslate(request, src='en', dest='fr', text=p.title))
+    #    titles.append({"title": gtrans.translate(p.title, dest='de').text,
+    #                   "description": gtrans.translate(p.description, dest='de').text
+    #                   })
+    # print(titles)
 
 
 @login_required
 @user_passes_test(lambda u: u.is_ceo)
 def ceo_dashboard(request):
-    post = Post.objects.all()
-    return render(request, 'main/dashboard_page.html', {'user': request.user, 'Posts': post})
+    post = Post.objects.all()  # .select_related()
+    current_lang = translation.get_language()
+    print('current language', current_lang)
+    now = datetime.datetime.now()  # datetime.datetime.now()  # .replace(tzinfo=utc)
+    return render(request, 'main/dashboard_page.html', {'user': request.user, 'Posts': post, 'lang': current_lang, 'current_time': now})
 
 
 @login_required
 @user_passes_test(lambda u: u.is_hr)
 def hr_dashboard(request):
-    post = Post.objects.filter(user__is_ceo=False)
-    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post})
+    post = Post.objects.select_related().filter(user__is_ceo=False)
+    current_lang = translation.get_language()
+    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post, 'lang': current_lang})
 
 
 @login_required
 @user_passes_test(lambda u: u.is_cto)
 def cto_dashboard(request):
-    post = Post.objects.filter(user__is_ceo=False) & Post.objects.filter(user__is_hr=False)
-    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post})
+    post = Post.objects.filter(
+        user__is_ceo=False) & Post.objects.filter(user__is_hr=False)
+    current_lang = translation.get_language()
+    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post, 'lang': current_lang})
 
 
 @login_required
@@ -216,7 +244,8 @@ def sse_dashboard(request):
     post = Post.objects.filter(user__is_ceo=False) & Post.objects.filter(user__is_hr=False) & Post.objects.filter(
         user__is_cto=False)
     print(post)
-    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post})
+    current_lang = translation.get_language()
+    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post, 'lang': current_lang})
 
 
 @login_required
@@ -225,4 +254,5 @@ def jse_dashboard(request):
     post = Post.objects.filter(user__is_ceo=False) & Post.objects.filter(user__is_hr=False) & Post.objects.filter(
         user__is_cto=False) & Post.objects.filter(user__is_senior_developer=False)
     print(post)
-    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post})
+    current_lang = translation.get_language()
+    return render(request, 'main/dashboard_page.html', {'user': request.user, "Posts": post, 'lang': current_lang})
